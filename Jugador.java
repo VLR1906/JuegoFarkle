@@ -17,5 +17,12 @@ public class Jugador {
 
     public void sumarPuntos(int puntos) {
         puntuacion += puntos;
+
+        public void resetearPuntos(){
+            this.puntuacion=0;
+        }
+        public String toString(){
+            return nombe+"Puntos:"+puntuacion;
+        }
     }
 }
