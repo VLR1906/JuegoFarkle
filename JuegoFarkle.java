@@ -1,9 +1,9 @@
 import java.util.*;
 
-class JuegoFarkle {
+public class JuegoFarkle {
     private List<Jugador> jugadores;
     private int turnoActual;
-    private final Scanner scanner;
+    private Scanner scanner;
 
     public JuegoFarkle(String[] nombresJugadores) {
         jugadores = new ArrayList<>();
@@ -18,6 +18,7 @@ class JuegoFarkle {
         Jugador jugador = jugadores.get(turnoActual);
         System.out.println("Turno de " + jugador.getNombre());
         List<Dado> dadosDisponibles = new ArrayList<>();
+        List<Dado> dadosConservados = new ArrayList<>();
         for (int i = 0; i < 6; i++) {
             dadosDisponibles.add(new Dado());
         }
@@ -41,6 +42,7 @@ class JuegoFarkle {
             if (puntos == 0) {
                 System.out.println("¡Farkle! Pierdes los puntos acumulados en este turno.");
                 puntosRonda = 0;
+                dadosConservados.clear();
                 break;
             }
 
@@ -65,11 +67,12 @@ class JuegoFarkle {
                     }
                 }
 
-                List<Dado> dadosConservados = new ArrayList<>();
+                List<Dado> nuevosConservados = new ArrayList<>();
                 for (int index : indices) {
-                    dadosConservados.add(dadosDisponibles.get(index));
+                    nuevosConservados.add(dadosDisponibles.get(index));
                 }
-                dadosDisponibles = dadosConservados;
+                dadosConservados.addAll(nuevosConservados);
+                dadosDisponibles.removeAll(nuevosConservados);
             }
 
             System.out.println("¿Quieres seguir lanzando? (s/n)");
@@ -78,6 +81,7 @@ class JuegoFarkle {
             }
         }
 
+        System.out.println("Dados conservados en todo el turno: " + dadosConservados);
         jugador.sumarPuntos(puntosRonda);
         System.out.println(jugador.getNombre() + " ahora tiene " + jugador.getPuntuacion() + " puntos.");
         turnoActual = (turnoActual + 1) % jugadores.size();
@@ -89,6 +93,5 @@ class JuegoFarkle {
             jugarTurno();
         }
     }
-
-
 }
+
