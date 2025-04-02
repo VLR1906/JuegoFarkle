@@ -1,28 +1,21 @@
 public class Jugador {
     private String nombre;
-    private int puntuacion;
+    private int puntosTotales;
 
     public Jugador(String nombre) {
         this.nombre = nombre;
-        this.puntuacion = 0;
+        this.puntosTotales = 0;
     }
 
     public String getNombre() {
         return nombre;
     }
 
-    public int getPuntuacion() {
-        return puntuacion;
+    public int getPuntosTotales() {
+        return puntosTotales;
     }
 
     public void sumarPuntos(int puntos) {
-        puntuacion += puntos;
-
-        public void resetearPuntos(){
-            this.puntuacion=0;
-        }
-        public String toString(){
-            return nombe+"Puntos:"+puntuacion;
-        }
+        this.puntosTotales += puntos;
     }
 }
