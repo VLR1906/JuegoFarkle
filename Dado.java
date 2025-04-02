@@ -5,7 +5,7 @@ public class Dado {
     private static final Random random = new Random();
 
     public Dado(int i) {
-        this.valor = 1; // Por defecto, el dado inicia en 1
+        this.valor = 0; // Por defecto, el dado inicia en 1
     }
 
     public void lanzar() {

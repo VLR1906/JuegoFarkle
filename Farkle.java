@@ -1,3 +1,4 @@
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,7 +79,11 @@ public class Farkle {
         if (puntosTurno > 0) {
             farkle = false;
         }
+
     }
+
+
+
 
     public void guardarPuntos() {
         if (!farkle) {
@@ -87,11 +92,13 @@ public class Farkle {
         cambiarTurno();
     }
 
-    private void cambiarTurno() {
+    public void cambiarTurno() {
         turnoActual = (turnoActual + 1) % jugadores.size();
         puntosTurno = 0;
         limpiarDadosGuardados(); // Limpiar los dados guardados al cambiar de turno
     }
+
+
 
     public List<Dado> getDados() {
         return dados;
