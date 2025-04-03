@@ -4,8 +4,8 @@ public class Dado {
     private int valor;
     private static final Random random = new Random();
 
-    public Dado(int i) {
-        this.valor = 0; // Por defecto, el dado inicia en 1
+    public Dado() {
+        this.valor = random.nextInt(6)+1; // Por defecto, el dado inicia en 1
     }
 
     public void lanzar() {
@@ -15,7 +15,7 @@ public class Dado {
     public int getValor() {
         return valor;
     }
-   public void setValor(int valor) {}
+    public void setValor(int valor) {}
     @Override
     public String toString() {
         return "Dado: " + valor;

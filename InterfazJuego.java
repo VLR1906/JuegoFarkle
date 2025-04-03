@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,36 +63,59 @@ public class InterfazJuego extends JFrame {
     }
 
     private void actualizarDados() {
-        dadosPanel.removeAll();
-        dadoBotones = new JButton[6];
+        dadosPanel.removeAll();  // Limpiar el panel de dados
+
+        dadoBotones = new JButton[6];  // Limpiar los botones si es necesario
 
         for (int i = 0; i < dados.size(); i++) {
             final int index = i;
-            dadoBotones[i] = new JButton(String.valueOf(dados.get(i).getValor()));
-            dadoBotones[i].setFont(new Font("Arial", Font.BOLD, 15));
 
+            // Cargar la imagen correspondiente al valor del dado
+            String nombreImagen = "/Dados/cara" + dados.get(i).getValor() + ".png"; // Ajustar el nombre
+            ImageIcon dadoIcon = new ImageIcon(getClass().getResource(nombreImagen));
+
+            // Escalar la imagen para que tenga un tamaño adecuado
+            Image imagenEscalada = dadoIcon.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
+            dadoIcon = new ImageIcon(imagenEscalada);
+
+            // Crear una etiqueta JLabel con la imagen del dado
+            JLabel dadoLabel = new JLabel(dadoIcon);
+            dadoLabel.setHorizontalAlignment(JLabel.CENTER);
+            dadoLabel.setVerticalAlignment(JLabel.CENTER);
+
+            // Si el dado está guardado, agregar un borde verde
             if (farkle.getDadosGuardados().get(i)) {
-                dadoBotones[i].setBackground(Color.GREEN);
+                dadoLabel.setBorder(BorderFactory.createLineBorder(Color.GREEN, 4));
             } else {
-                dadoBotones[i].setBackground(Color.WHITE);
+                dadoLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 4));
             }
 
-            dadoBotones[i].setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-            dadoBotones[i].addActionListener(e -> {
-                farkle.guardarDado(index);
-                actualizarDados();
+            // Agregar un evento de clic para guardar los dados
+            dadoLabel.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    farkle.guardarDado(index);
+                    actualizarDados();  // Actualiza la interfaz después de guardar el dado
+                }
             });
 
-            dadosPanel.add(dadoBotones[i]);
+            dadosPanel.add(dadoLabel);  // Añadir la etiqueta con la imagen al panel
         }
 
-        dadosPanel.revalidate();
-        dadosPanel.repaint();
+        dadosPanel.revalidate();  // Revalidar el panel después de actualizarlo
+        dadosPanel.repaint();  // Redibujar el panel
     }
+
 
 
     private void cambiarTurno() {
         farkle.cambiarTurno(); // Llama al método que ya cambia el turno en la lógica del juego
+
+        // Verificar si alguien ha ganado después del turno
+        if (farkle.getJugadorActual().getPuntosTotales() >= Farkle.PUNTOS_GANADOR) {
+            JOptionPane.showMessageDialog(this, farkle.getJugadorActual().getNombre() + " ha ganado el juego!", "¡Ganador!", JOptionPane.INFORMATION_MESSAGE);
+            System.exit(0); // Termina el juego
+        }
 
         // Mostrar las puntuaciones de todos los jugadores
         StringBuilder puntuaciones = new StringBuilder("Puntuaciones actuales:\n");
@@ -105,6 +130,7 @@ public class InterfazJuego extends JFrame {
         puntosTurnoLabel.setText("Puntos Turno: 0");
         actualizarDados();
     }
+
 
 
 
