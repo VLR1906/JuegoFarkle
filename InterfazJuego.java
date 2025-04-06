@@ -111,11 +111,11 @@ public class InterfazJuego extends JFrame {
     private void cambiarTurno() {
         farkle.cambiarTurno(); // Llama al método que ya cambia el turno en la lógica del juego
 
-        // Verificar si alguien ha ganado después del turno
-        if (farkle.getJugadorActual().getPuntosTotales() >= Farkle.PUNTOS_GANADOR) {
-            JOptionPane.showMessageDialog(this, farkle.getJugadorActual().getNombre() + " ha ganado el juego!", "¡Ganador!", JOptionPane.INFORMATION_MESSAGE);
-            System.exit(0); // Termina el juego
-        }
+//        // Verificar si alguien ha ganado después del turno
+//        if (farkle.getJugadorActual().getPuntosTotales() >= Farkle.PUNTOS_GANADOR) {
+//            JOptionPane.showMessageDialog(this, farkle.getJugadorActual().getNombre() + " ha ganado el juego!", "¡Ganador!", JOptionPane.INFORMATION_MESSAGE);
+//            System.exit(0); // Termina el juego
+//        }
 
         // Mostrar las puntuaciones de todos los jugadores
         StringBuilder puntuaciones = new StringBuilder("Puntuaciones actuales:\n");
@@ -141,27 +141,44 @@ public class InterfazJuego extends JFrame {
         guardarButton.setEnabled(true);
 
         // Si no hay puntos, es un Farkle
-        if (farkle.getPuntosTurno() == 0) {
-            JOptionPane.showMessageDialog(this, "¡Farkle! No obtuviste puntos en este turno.");
+        if (!farkle.generaPuntos()) {
+            JOptionPane.showMessageDialog(this, "¡Farkle! No obtuviste puntos. Pierdes los acumulados del turno.");
+            farkle.resetearTurno(); // o lo que uses para reiniciar puntaje
             guardarButton.setEnabled(false);
             cambiarTurno();
+            return;
+        }
+
+
+
+        // Si alcanzó los 6 lanzamientos, forzar el cambio de turno
+        if (farkle.getLanzamientosTurno() >= 6) {
+            JOptionPane.showMessageDialog(this, "¡Has alcanzado el máximo de 6 lanzamientos! Se cambia el turno.");
+            guardarPuntos(); // Guarda automáticamente los puntos antes de cambiar
         }
     }
 
 
-
-
-
-
-
-
     private void guardarPuntos() {
-        farkle.guardarPuntos();
+        Jugador jugadorQueJugo = farkle.getJugadorActual(); // <-- Guardamos quién estaba jugando
+
+        farkle.guardarPuntos(); // Esto cambia el turno internamente
         actualizarPuntuaciones();
+
+        // Verificamos los puntos del jugador que acaba de jugar
+        if (jugadorQueJugo.getPuntosTotales() >= Farkle.PUNTOS_GANADOR) {
+            JOptionPane.showMessageDialog(this, jugadorQueJugo.getNombre() + " ha ganado el juego con " +
+                    jugadorQueJugo.getPuntosTotales() + " puntos!", "¡Ganador!", JOptionPane.INFORMATION_MESSAGE);
+            System.exit(0); // Termina el juego
+            return;
+        }
+
         mensajeTurnoLabel.setText("Es el turno de: " + farkle.getJugadorActual().getNombre());
         guardarButton.setEnabled(false);
         actualizarDados();
     }
+
+
 
     private void actualizarPuntuaciones() {
         List<Jugador> jugadores = farkle.getJugadores();
