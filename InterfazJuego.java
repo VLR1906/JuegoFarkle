@@ -5,15 +5,22 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Clase principal de la interfaz gráfica del juego Farkle.
+ * Hereda de JFrame y gestiona la visualización, interacción y flujo del juego.
+ */
 public class InterfazJuego extends JFrame {
-    private Farkle farkle;
-    private JButton lanzarButton, guardarButton;
-    private JLabel puntosTurnoLabel, mensajeTurnoLabel;
-    private JPanel dadosPanel, puntosPanel;
-    private List<Dado> dados;
-    private JButton[] dadoBotones;
-    private List<JLabel> etiquetasPuntosJugadores;
+    private Farkle farkle; // Lógica del juego
+    private JButton lanzarButton, guardarButton; // Botones para lanzar dados y guardar puntos
+    private JLabel puntosTurnoLabel, mensajeTurnoLabel; // Etiquetas para mostrar información del turno
+    private JPanel dadosPanel, puntosPanel; // Paneles de interfaz
+    private List<Dado> dados; // Lista de dados actuales
+    private JButton[] dadoBotones; // Botones de los dados (no usados directamente en esta versión)
+    private List<JLabel> etiquetasPuntosJugadores; // Etiquetas que muestran puntos de los jugadores
 
+    /**
+     * Constructor: inicializa la interfaz, lógica del juego y componentes.
+     */
     public InterfazJuego(List<String> nombres) {
         setTitle("Juego  Farkle");
         setSize(900, 800);
@@ -23,24 +30,29 @@ public class InterfazJuego extends JFrame {
         farkle = new Farkle(nombres);
         dados = farkle.getDados();
 
+        // Botones de control
         lanzarButton = new JButton("Lanzar Dados");
         guardarButton = new JButton("Guardar Puntos");
-        guardarButton.setEnabled(false);
+        guardarButton.setEnabled(false); // Desactivado hasta lanzar
 
+        // Panel de botones
         JPanel controlPanel = new JPanel();
         controlPanel.setLayout(new FlowLayout());
         controlPanel.add(lanzarButton);
         controlPanel.add(guardarButton);
 
+        // Panel para mostrar los dados
         dadosPanel = new JPanel();
         dadosPanel.setLayout(new GridLayout(1, 6));
         dadosPanel.setBackground(Color.WHITE);
 
+        // Etiquetas de puntuación
         puntosTurnoLabel = new JLabel("Puntos Turno: 0");
         mensajeTurnoLabel = new JLabel("Es el turno de: " + farkle.getJugadorActual().getNombre());
 
+        // Panel lateral con puntuaciones
         puntosPanel = new JPanel();
-        puntosPanel.setLayout(new GridLayout(nombres.size() + 2, 1)); // +2 para etiquetas extra
+        puntosPanel.setLayout(new GridLayout(nombres.size() + 2, 1));
         puntosPanel.add(puntosTurnoLabel);
         puntosPanel.add(mensajeTurnoLabel);
 
@@ -51,73 +63,71 @@ public class InterfazJuego extends JFrame {
             puntosPanel.add(label);
         }
 
+        // Añadir paneles al frame principal
         add(puntosPanel, BorderLayout.WEST);
         add(dadosPanel, BorderLayout.CENTER);
         add(controlPanel, BorderLayout.SOUTH);
 
+        // Acción al presionar los botones
         lanzarButton.addActionListener(e -> lanzarDados());
         guardarButton.addActionListener(e -> guardarPuntos());
 
-        actualizarDados();
+        actualizarDados(); // Mostrar los dados inicialmente
         setVisible(true);
     }
 
+    /**
+     * Actualiza la visualización de los dados en la interfaz.
+     */
     private void actualizarDados() {
-        dadosPanel.removeAll();  // Limpiar el panel de dados
-
-        dadoBotones = new JButton[6];  // Limpiar los botones si es necesario
+        dadosPanel.removeAll(); // Limpiar el panel actual
+        dadoBotones = new JButton[6]; // (Aunque no se usan aquí)
 
         for (int i = 0; i < dados.size(); i++) {
             final int index = i;
 
-            // Cargar la imagen correspondiente al valor del dado
-            String nombreImagen = "/Dados/cara" + dados.get(i).getValor() + ".png"; // Ajustar el nombre
+            // Cargar imagen del dado según su valor
+            String nombreImagen = "/Dados/cara" + dados.get(i).getValor() + ".png";
             ImageIcon dadoIcon = new ImageIcon(getClass().getResource(nombreImagen));
-
-            // Escalar la imagen para que tenga un tamaño adecuado
             Image imagenEscalada = dadoIcon.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
             dadoIcon = new ImageIcon(imagenEscalada);
 
-            // Crear una etiqueta JLabel con la imagen del dado
+            // Crear etiqueta con la imagen
             JLabel dadoLabel = new JLabel(dadoIcon);
             dadoLabel.setHorizontalAlignment(JLabel.CENTER);
             dadoLabel.setVerticalAlignment(JLabel.CENTER);
 
-            // Si el dado está guardado, agregar un borde verde
+            // Borde visual para dados guardados
             if (farkle.getDadosGuardados().get(i)) {
                 dadoLabel.setBorder(BorderFactory.createLineBorder(Color.GREEN, 4));
             } else {
                 dadoLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 4));
             }
 
-            // Agregar un evento de clic para guardar los dados
+            // Permitir hacer clic para guardar/soltar el dado
             dadoLabel.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     farkle.guardarDado(index);
-                    actualizarDados();  // Actualiza la interfaz después de guardar el dado
+                    actualizarDados();
                 }
             });
 
-            dadosPanel.add(dadoLabel);  // Añadir la etiqueta con la imagen al panel
+            dadosPanel.add(dadoLabel);
         }
 
-        dadosPanel.revalidate();  // Revalidar el panel después de actualizarlo
-        dadosPanel.repaint();  // Redibujar el panel
+        dadosPanel.revalidate();
+        dadosPanel.repaint();
     }
 
-
-
+    /**
+     * Lógica para cambiar el turno actual.
+     * Muestra un mensaje con la puntuación de todos los jugadores.
+     */
     private void cambiarTurno() {
-        farkle.cambiarTurno(); // Llama al método que ya cambia el turno en la lógica del juego
+        farkle.cambiarTurno();
 
-//        // Verificar si alguien ha ganado después del turno
-//        if (farkle.getJugadorActual().getPuntosTotales() >= Farkle.PUNTOS_GANADOR) {
-//            JOptionPane.showMessageDialog(this, farkle.getJugadorActual().getNombre() + " ha ganado el juego!", "¡Ganador!", JOptionPane.INFORMATION_MESSAGE);
-//            System.exit(0); // Termina el juego
-//        }
-
-        // Mostrar las puntuaciones de todos los jugadores
+        // Mostrar puntuaciones
         StringBuilder puntuaciones = new StringBuilder("Puntuaciones actuales:\n");
         for (Jugador jugador : farkle.getJugadores()) {
             puntuaciones.append(jugador.getNombre()).append(": ").append(jugador.getPuntosTotales()).append(" puntos\n");
@@ -125,51 +135,51 @@ public class InterfazJuego extends JFrame {
 
         JOptionPane.showMessageDialog(this, puntuaciones.toString(), "Cambio de turno", JOptionPane.INFORMATION_MESSAGE);
 
-        // Actualizar interfaz con el nuevo jugador
+        // Actualizar interfaz
         mensajeTurnoLabel.setText("Es el turno de: " + farkle.getJugadorActual().getNombre());
         puntosTurnoLabel.setText("Puntos Turno: 0");
         actualizarDados();
     }
 
-
-
-
+    /**
+     * Ejecuta un lanzamiento de dados y gestiona la lógica de Farkle.
+     */
     private void lanzarDados() {
         farkle.lanzarDados();
         actualizarDados();
         puntosTurnoLabel.setText("Puntos Turno: " + farkle.getPuntosTurno());
         guardarButton.setEnabled(true);
 
-        // Si no hay puntos, es un Farkle
+        // Si no se generan puntos → Farkle
         if (!farkle.generaPuntos()) {
             JOptionPane.showMessageDialog(this, "¡Farkle! No obtuviste puntos. Pierdes los acumulados del turno.");
-            farkle.resetearTurno(); // o lo que uses para reiniciar puntaje
+            farkle.resetearTurno();
             guardarButton.setEnabled(false);
             cambiarTurno();
             return;
         }
 
-
-
-        // Si alcanzó los 6 lanzamientos, forzar el cambio de turno
+        // Si se han lanzado los dados 6 veces → cambio de turno automático
         if (farkle.getLanzamientosTurno() >= 6) {
             JOptionPane.showMessageDialog(this, "¡Has alcanzado el máximo de 6 lanzamientos! Se cambia el turno.");
-            guardarPuntos(); // Guarda automáticamente los puntos antes de cambiar
+            guardarPuntos(); // Guarda automáticamente
         }
     }
 
-
+    /**
+     * Guarda los puntos acumulados del turno y verifica si hay un ganador.
+     */
     private void guardarPuntos() {
-        Jugador jugadorQueJugo = farkle.getJugadorActual(); // <-- Guardamos quién estaba jugando
+        Jugador jugadorQueJugo = farkle.getJugadorActual();
 
-        farkle.guardarPuntos(); // Esto cambia el turno internamente
+        farkle.guardarPuntos(); // Cambia el turno internamente
         actualizarPuntuaciones();
 
-        // Verificamos los puntos del jugador que acaba de jugar
+        // Verificar si ganó el jugador
         if (jugadorQueJugo.getPuntosTotales() >= Farkle.PUNTOS_GANADOR) {
             JOptionPane.showMessageDialog(this, jugadorQueJugo.getNombre() + " ha ganado el juego con " +
                     jugadorQueJugo.getPuntosTotales() + " puntos!", "¡Ganador!", JOptionPane.INFORMATION_MESSAGE);
-            System.exit(0); // Termina el juego
+            System.exit(0); // Finaliza el juego
             return;
         }
 
@@ -178,8 +188,9 @@ public class InterfazJuego extends JFrame {
         actualizarDados();
     }
 
-
-
+    /**
+     * Actualiza las etiquetas con las puntuaciones de todos los jugadores.
+     */
     private void actualizarPuntuaciones() {
         List<Jugador> jugadores = farkle.getJugadores();
         for (int i = 0; i < jugadores.size(); i++) {
@@ -187,6 +198,9 @@ public class InterfazJuego extends JFrame {
         }
     }
 
+    /**
+     * Método principal para lanzar el juego. Solicita número y nombres de jugadores.
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             int numJugadores;
@@ -200,6 +214,7 @@ public class InterfazJuego extends JFrame {
                 }
             } while (numJugadores < 2 || numJugadores > 6);
 
+            // Pedir nombres de jugadores
             List<String> nombres = new ArrayList<>();
             for (int i = 1; i <= numJugadores; i++) {
                 String nombre = JOptionPane.showInputDialog(null, "Nombre del jugador " + i + ":", "Jugadores", JOptionPane.QUESTION_MESSAGE);
@@ -209,7 +224,7 @@ public class InterfazJuego extends JFrame {
                 nombres.add(nombre);
             }
 
-            new InterfazJuego(nombres);
+            new InterfazJuego(nombres); // Iniciar el juego
         });
     }
 }
